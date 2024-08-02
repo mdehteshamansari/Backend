@@ -3,7 +3,9 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app, resources={r"/bfhl": {"origins": "http://localhost:3000"}})  # Enable CORS for specific route and origin
-
+@app.route("/")
+def home():
+    return "Hello World", 200
 @app.route('/bfhl', methods=['POST'])
 def post_bfhl():
     data = request.json.get('data')
