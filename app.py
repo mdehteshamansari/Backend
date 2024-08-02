@@ -1,36 +1,38 @@
 from flask import Flask, request, jsonify
-from datetime import datetime
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app, resources={r"/bfhl": {"origins": "http://localhost:3000"}})  # Enable CORS for specific route and origin
 
-@app.route('/bfhl', methods=['GET', 'POST'])
-def bfhl():
-    if request.method == 'GET':
-        return jsonify({"operation_code": 1}), 200
+@app.route('/bfhl', methods=['POST'])
+def post_bfhl():
+    data = request.json.get('data')
+    print("Received data:", data)  # Debug print
 
-    if request.method == 'POST':
-        data = request.get_json()
-        full_name = data.get('full_name', 'john_doe')
-        dob = data.get('dob', '17091999')
-        user_id = f"{full_name}_{dob}"
+    if not data:
+        print("No data provided")  # Debug print
+        return jsonify({"is_success": False, "message": "No data provided"}), 400
 
-        email = "john@xyz.com"
-        roll_number = "ABCD123"
-        numbers = [x for x in data['data'] if x.isdigit()]
-        alphabets = [x for x in data['data'] if x.isalpha()]
-        highest_alphabet = [max(alphabets, key=str.upper)] if alphabets else []
+    numbers = [x for x in data if x.isdigit()]
+    alphabets = [x for x in data if x.isalpha()]
+    highest_alphabet = max(alphabets, key=str.lower) if alphabets else ""
 
-        response = {
-            "is_success": True,
-            "user_id": user_id,
-            "email": email,
-            "roll_number": roll_number,
-            "numbers": numbers,
-            "alphabets": alphabets,
-            "highest_alphabet": highest_alphabet
-        }
+    response = {
+        "is_success": True,
+        "user_id": "your_name_ddmmyyyy",
+        "email": "your_email@example.com",
+        "roll_number": "your_roll_number",
+        "numbers": numbers,
+        "alphabets": alphabets,
+        "highest_alphabet": highest_alphabet
+    }
 
-        return jsonify(response), 200
+    print("Response:", response)  # Debug print
+    return jsonify(response)
+
+@app.route('/bfhl', methods=['GET'])
+def get_bfhl():
+    return jsonify({"operation_code": 1})
 
 if __name__ == '__main__':
     app.run(debug=True)
